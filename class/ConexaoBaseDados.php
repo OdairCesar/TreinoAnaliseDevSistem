@@ -13,21 +13,25 @@
  */
 class ConexaoBaseDados {
     //put your code here
-    private $local, $usuario, $senha, $conexao, $db;
+    private $local, //local do servidor de dados
+            $usuario,//nome do usuario que acessará o banco de dados
+            $senha, //senha do mesmo
+            $conexao, //sera a conexão do php com o servidor do SGBD
+            $db;//nome do banco de dados
     
-    private function PassarValores($usuario, $senha, $local, $db){
+    private function PassarValores($usuario, $senha, $local, $db){//aqui passa os dados para conectar, somente quanto for formar o objeto de conexao
         $this->setUsuario($usuario);
         $this->setSenha($senha);
         $this->setLocal($local);
         $this->setDb($db);
     }
-    private function PassarValoresManual(){
+    private function PassarValoresManual(){//aqui é passado os dados no proprio codigo, é um risco já que deixa os dados do seu servidor acessiveis
         $this->setUsuario("root");
         $this->setDb("id...");
         $this->setSenha("");
         $this->setLocal("localhost");
     }
-    private function Acessar(){
+    private function Acessar(){// aqui nos conectamos com o SGBD
         try{
             $this->conexao = new PDO('mysql:host='.$this->getLocal().';dbname='. $this->getDb(), $this->getUsuario(), $this->getSenha());
             $this->conexao->exec("set names utf8");
@@ -35,7 +39,18 @@ class ConexaoBaseDados {
             echo "Erro ao conectar".$e->getMessage();
         }
     }
-    
+    private function __construct($logico, $usuario, $senha, $local, $db) {
+        /* CONSTRUTOR DA CLASSE NELE TEM UM LOGICO PARA SABER SE OS DADOS DO SGBD SERÁ PASSADO NA CRIAÇÃO OU NO CODIGO ANTERIORES
+         */
+        if($logico){
+            $this->PassarValoresManual();
+        }else{
+            $this->PassarValores($usuario, $senha, $local, $db);
+        }
+        $this->Acessar();
+    }
+
+
     public function getLocal() {
         return $this->local;
     }
