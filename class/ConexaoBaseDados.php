@@ -27,7 +27,7 @@ class ConexaoBaseDados {
     }
     private function PassarValoresManual(){//aqui é passado os dados no proprio codigo, é um risco já que deixa os dados do seu servidor acessiveis
         $this->setUsuario("root");
-        $this->setDb("id...");
+        $this->setDb("dados_sistema_perguntas");
         $this->setSenha("");
         $this->setLocal("localhost");
     }
@@ -39,13 +39,13 @@ class ConexaoBaseDados {
             echo "Erro ao conectar".$e->getMessage();
         }
     }
-    private function __construct($logico, $usuario, $senha, $local, $db) {
+    public function __construct($logico, $usuario, $senha, $local, $db) {
         /* CONSTRUTOR DA CLASSE NELE TEM UM LOGICO PARA SABER SE OS DADOS DO SGBD SERÁ PASSADO NA CRIAÇÃO OU NO CODIGO ANTERIORES
          */
         if($logico){
-            $this->PassarValoresManual();
-        }else{
             $this->PassarValores($usuario, $senha, $local, $db);
+        }else{
+            $this->PassarValoresManual();
         }
         $this->Acessar();
     }

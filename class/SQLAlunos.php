@@ -15,24 +15,33 @@ require_once 'ConexaoBaseDados.php';
 
 class SQLAlunos extends ConexaoBaseDados {
     //put your code here
-    private $infoAluno;
+    private $infoAluno, $aluno;
     private $query;
     
-    protected function MontarQuery($idAluno){//Passamos o id informado pelo aluno para um select
-        $this->setQuery("SELECT * FROM disciplinas WHERE idAluno = $idAluno LIMIT 1");
+    public function QueryContar($aluno, $acertadas, $erradas){
+        $this->setQuery("INSERT INTO alunos WHERE nomeAluno = $aluno (contAcertadas) values (++$acertadas)");
+        $this->getConexao()->query($this->getQuery());
+
+        $this->setQuery("INSERT INTO alunos WHERE nomeAluno = ".$this->getAluno()." (`contErradas`) values (+=$erradas)");
+        $this->getConexao()->query($this->getQuery());
     }
 
-    protected function FazerConsulta(){
+    public function MontarQuery($idAluno){//Passamos o id informado pelo aluno para um select
+        $this->setAluno($idAluno);
+        $this->setQuery("SELECT * FROM alunos WHERE idAluno = $idAluno LIMIT 1");
+    }
+
+    public function FazerConsulta(){
         /* Pesquisamos os dados do aluno no banco de dados. 
          * Se caso ele nao existir para um logico falso que usaremos depois, para negar a contabilização de perguntas acertadas ou erradas.
          */
         $select = $this->getConexao()->query($this->getQuery());
-        while($res = $select->fetch(PDO::FETCH_OB3)){
-            $this->setInfoAluno(Array($res->idAluno, $res->nomeAluno, $res->contAcertadas, $res->contErradas));
+        if(!empty($select)){
+            while($res = $select->fetch(PDO::FETCH_OBJ)){
+                $this->setInfoAluno(Array($res->idAluno, $res->nomeAluno, $res->contAcertadas, $res->contErradas));
+            }
         }
-        if ($this->getInfoAluno()[1] == null){
-            $this->setInfoAluno(false);
-        }
+        $this->setQuery(null);
     }
     public function getQuery() {
         return $this->query;
